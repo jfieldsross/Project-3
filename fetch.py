@@ -26,7 +26,7 @@ class Fetch:
 
         # if the second element in the buffer is -1, there is empty space
         # if there is no empty space, the fetch unit stalls
-        emptyRoomInPreIssueBuffer = self.preIssueBuff[1] = -1
+        emptyRoomInPreIssueBuffer = self.preIssueBuff[1] == -1
 
         # check to see if cache contains next instruction
         # instructionIndex = the index of the next instruction to be fetched
@@ -37,10 +37,32 @@ class Fetch:
 
         notBranch = False
         notBreak = True
+        hazard = False
 
         if cacheHit:
             #TODO decode the instruction
             print("decode instruction here")
+            if self.opcodeStr[instructionIndex] == "B":
+                self.PC = self.PC + ((4 * self.arg1[instructionIndex]) - 4)
+
+            elif self.opcodeStr[instructionIndex] == "CBZ":
+                if self.R[self.arg2[instructionIndex]] == 0:
+                    for i in range(len(self.preIssueBuff)):
+                        if self.preIssueBuff[i] != -1:
+                            if self.src1Reg[instructionIndex] == self.destReg[self.preIssueBuff[i]] or self.src2Reg[instructionIndex] == self.destReg[self.preIssueBuff[i]]:
+                                hazard = True
+                    if hazard != True:
+                        self.PC = self.PC + ((4 * self.arg1[instructionIndex]) - 4)
+            elif self.opcodeStr[instructionIndex] == "CBNZ":
+                if self.R[self.arg2[instructionIndex]] != 0:
+                    for i in range(len(self.preIssueBuff)):
+                        if self.preIssueBuff[i] != -1:
+                            if self.src1Reg[instructionIndex] == self.destReg[self.preIssueBuff[i]] or self.src2Reg[instructionIndex] == self.destReg[self.preIssueBuff[i]]:
+                                hazard = True
+                    if hazard != True:
+                        self.PC = self.PC + ((4 * self.arg1[instructionIndex]) - 4)
+
+
 
             #TODO if it's not a branch instruction set to True
             notBranch = True
