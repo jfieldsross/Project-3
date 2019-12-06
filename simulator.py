@@ -47,7 +47,7 @@ class simClass:
         self.cache = cache.Cache(numInstrs, instruction, dataval, address)
         self.issue = issue.Issue(instruction, opcodes, opcodeStr, dataval, address, arg1, arg2,
                                  arg3, numInstrs, destReg, src1Reg, src2Reg, self.preIssueBuff,
-                                 self.preALUBuff, self.preMemBuff)
+                                 self.preALUBuff, self.preMemBuff, self.postALUBuff, self.postMemBuff)
         #self.fetch = fetch.Fetch(instruction, opcodes, opcodeStr, dataval, address, arg1, arg2,
         #                        arg3, numInstrs, destReg, src1Reg, src2Reg)
 

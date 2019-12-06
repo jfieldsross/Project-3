@@ -1,8 +1,11 @@
+from helpers import SetUp
+
+
 class Issue:
 
     def __init__(self, instruction, opcodes, opcodeStr, dataval, address, arg1, arg2,
                                 arg3, numInstrs, destReg, src1Reg, src2Reg, preIssueBuff,
-                                preALUBuff, preMemBuff):
+                                preALUBuff, preMemBuff, postALUBuff, postMemBuff):
 
         self.instruction = instruction
         self.opcodes = opcodes
@@ -19,35 +22,50 @@ class Issue:
         self.preIssueBuff = preIssueBuff
         self.preALUBuff = preALUBuff
         self.preMemBuff = preMemBuff
+        self.postALUBuff = postALUBuff
+        self.postMemBuff = postMemBuff
 
-    # this method issues the given instruction to the preMemBuff
-    # warning: do not call this method until all necessary conditions have been met!
-    @classmethod
-    def issueMemInstruction(self, instructionIndex):
-        if self.preMemBuff[0] == -1:
-            self.preMemBuff[0] = instructionIndex
-        elif self.preMemBuff[1] == -1:
-            self.preMemBuff[1] = instructionIndex
-        else:
-            print("ERROR!!! trying to issue an instruction into preMemBuff while there is no room")
+    # this method checks for Read After Write hazards between the current
+    # instruction and the other instructions in the buffers
+    # returns False if there is a hazard, True otherwise
+    def RAWCheck(self, curr):
 
-    # this method issues the given instruction to the preALUBuff
-    # warning: do not call this method until all necessary conditions have been met!
-    @classmethod
-    def issueALUInstruction(self, instructionIndex):
-        if self.preALUBuff[0] == -1:
-            self.preALUBuff[0] = instructionIndex
-        elif self.preALUBuff[1] == -1:
-            self.preALUBuff[1] = instructionIndex
-        else:
-            print("ERROR!!! trying to issue an instruction into preALUBuff while there is no room")
+        index = self.preIssueBuff[curr]
+
+        if curr > 0:
+            for i in range(0, curr):
+                if self.src1Reg[index] == self.destReg[self.preIssueBuff[i]] or self.src2Reg[index] == self.destReg[self.preIssueBuff[i]]:
+                    # found RAW in preIssueBuff
+                    return False
+
+        # see if there is a RAW in the preMemBuff
+        for i in range(0, len(self.preMemBuff)):
+            if self.preMemBuff[i] != -1:
+                if self.src1Reg[index] == self.destReg[self.preMemBuff[i]] or self.src2Reg[index] == self.destReg[self.preMemBuff[i]]:
+                    # found RAW in preMemBuff
+                    return False
+
+        # see if there is a RAW in the preALUBuff
+        for i in range(0, len(self.preALUBuff)):
+            if self.preALUBuff[i] != -1:
+                if self.src1Reg[index] == self.destReg[self.preALUBuff[i]] or self.src2Reg[index] == self.destReg[self.preALUBuff[i]]:
+                    # found RAW in preALUBuff
+                    return False
+
+        # see if there is a RAW in the post buffs too
+        if self.postALUBuff[1] != -1:
+            if self.src1Reg[index] == self.destReg[self.postALUBuff[1]] or self.src2Reg[index] == self.destReg[self.postALUBuff[1]]:
+                # found RAW in postALUBuff
+                return False
+
+        # if there are no RAW hazards, return True
+        return True
 
     def run(self):
 
-        # if there is no room in the preALUBuff or preMemBuff then instructions
-        # of that type can't be issued this cycle to avoid a structural hazard
-        thereIsRoomInPreALUBuff = self.preALUBuff[1] == -1
-        thereIsRoomInPreMemBuff = self.preMemBuff[1] == -1
+        numInPreIssueBuffer = 0
+        numIssued = 0
+        curr = self.preIssueBuff[0]
 
         # if the instruction is load or store, it can't be issued until all prior stores
         # instructions are issued.
@@ -55,26 +73,58 @@ class Issue:
         # buffer that can't be issued for any reason.
         storeInstructionSkippedThisCycle = False
 
-        # for each instruction in the preIssueBuff, check to see if it can be issued.
-        # if all conditions are met, issue the instruction via the issueMemInstruction()
-        # or issueALUInstruction() methods
+        # count how many entries in the preIssueBuff have instructions in them
         for i in range(len(self.preIssueBuff)):
+            if i != -1:
+                numInPreIssueBuffer += 1
 
-            # if the instruction is using the preMemBuff
-            if self.opcodeStr[i] == "LDUR" or self.opcodeStr[i] == "STUR":
+        while (numIssued < 2 and numInPreIssueBuffer > 0 and curr < 4):
+            # if there is no room in the preALUBuff or preMemBuff then instructions
+            # of that type can't be issued this cycle to avoid a structural hazard
+            thereIsRoomInPreALUBuff = self.preALUBuff[1] == -1
+            thereIsRoomInPreMemBuff = self.preMemBuff[1] == -1
 
-                # if there is an empty spot in the preMemBuff AND no skip instructions
-                # have been skipped this cycle
-                if thereIsRoomInPreMemBuff and not storeInstructionSkippedThisCycle:
-                    # this method issues the instruction to the preMemBuff
-                    self.issueMemInstruction(i)
+            index = self.preIssueBuff[curr]
+            issueMe = False
 
-                    # check to see if the buffer is full after issuing a new instruction to it
-                    thereIsRoomInPreMemBuff = self.preMemBuff[1] == -1
+            # if the instruction is a mem instruction and there is room in the pre mem buffer
+            if SetUp.isMemOp(self.opcodeStr[index]) and thereIsRoomInPreMemBuff:
+                # RAWCheck method will check if there are any RAW hazards with the current instruction
+                # issueMe will equal True if there are no RAW hazards, false if there are
+                issueMe = self.RAWCheck(curr)
 
-                # if the mem instruction doesn't get issued, AND is a store instruction,
-                # then storeInstructionSkippedThisCycle must be set to True
-                elif self.opcodeStr[i] == "STUR":
-                    storeInstructionSkippedThisCycle = True
+            # if the instruction is an ALU instruction and there is room in the pre ALU buffer
+            if SetUp.isALUOp(self.opcodeStr[self.preIssueBuff[index]]) and thereIsRoomInPreALUBuff:
+                # RAWCheck method will check if there are any RAW hazards with the current instruction
+                # issueMe will equal True if there are no RAW hazards, false if there are
+                issueMe = self.RAWCheck(curr)
 
-            # TODO: Add non-mem instructions
+            # if the instruction is a store instruction, and it isn't being issued,
+            # then no subsequent mem instructions may be issued for the rest of the cycle
+            if self.opcodeStr[index] == "STUR" and not issueMe:
+                storeInstructionSkippedThisCycle = True
+
+            # if the instruction is a mem instruction, check to see that all previous store
+            # instructions have been issued. If not, the instruction may not be issued this cycle
+            if SetUp.isMemOp(self.opcodeStr[index]) and storeInstructionSkippedThisCycle:
+                issueMe = False
+
+
+            # if issueMe = True at this point, it has passed all of the tests and met all
+            # of the necessary criteria to be issued!
+            if issueMe:
+                numIssued += 1
+                # copy the instruction to the appropriate buffer
+                if SetUp.isMemOp(self.opcodeStr[index]):
+                    self.preMemBuff[self.preMemBuff.index(-1)] = index
+                else:
+                    self.preALUBuff[self.preALUBuff.index(-1)] = index
+
+                # move the instrs in the preIssueBuff down one level
+                self.preIssueBuff[0:curr] = self.preIssueBuff[0:curr]
+                self.preIssueBuff[curr:3] = self.preIssueBuff[curr + 1:]  # dropped 4, think will go to end always
+                self.preIssueBuff[3] = -1
+                numInPreIssueBuffer -= 1
+            else:
+                # move on to the next instruction in preIssueBuff
+                curr += 1

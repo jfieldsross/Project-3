@@ -123,3 +123,38 @@ class SetUp:
     def binaryToDecimal(cls, binary):
         print("\n")
         print(int(binary, 2))
+
+    #returns true if the provided opcodeStr is for a mem instruction
+    @classmethod
+    def isMemOp(cls, opcodeStr):
+        return opcodeStr == "STUR" or opcodeStr == "LDUR"
+
+    #returns true if the provided opcodeStr is for a alu instruction
+    @classmethod
+    def isALUOp(cls, opcodeStr):
+        if opcodeStr == "ADD":  # ADD
+            return True
+        elif opcodeStr == "SUB":  # SUB
+            return True
+        elif opcodeStr == "AND":
+            return True
+        elif opcodeStr == "ORR":
+            return True
+        elif opcodeStr == "ADDI":
+            return True
+        elif opcodeStr == "SUBI":
+            return True
+        elif opcodeStr == "MOVZ":
+            return True
+        elif opcodeStr == "MOVK":
+            return True
+        elif opcodeStr == "ASR":
+            return True
+        elif opcodeStr == "LSL":
+            return True
+        elif opcodeStr == "LSR":
+            return True
+        elif opcodeStr == "EOR":
+            return True
+        else:
+            return False
