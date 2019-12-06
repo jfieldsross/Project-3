@@ -5,6 +5,7 @@ import fetch
 import writeBack
 import alu
 import mem
+import issue
 from helpers import SetUp
 import masking_constants as MASKs
 
@@ -44,8 +45,9 @@ class simClass:
         self.ALU = alu.ALU(self.R, self.postALUBuff, self.preALUBuff, opcodeStr, arg1, arg2, arg3)
         self.MEM = mem.MEM(self.R, self.postMemBuff, self.preMemBuff, opcodeStr, arg1, arg2, arg3, dataval, address, self.numInstructions)
         self.cache = cache.Cache(numInstrs, instruction, dataval, address)
-        #self.issue = issue.Issue(instruction, opcodes, opcodeStr, dataval, address, arg1, arg2,
-        #                         arg3, numInstrs, destReg, src1Reg, src2Reg)
+        self.issue = issue.Issue(instruction, opcodes, opcodeStr, dataval, address, arg1, arg2,
+                                 arg3, numInstrs, destReg, src1Reg, src2Reg, self.preIssueBuff,
+                                 self.preALUBuff, self.preMemBuff)
         #self.fetch = fetch.Fetch(instruction, opcodes, opcodeStr, dataval, address, arg1, arg2,
         #                        arg3, numInstrs, destReg, src1Reg, src2Reg)
 
