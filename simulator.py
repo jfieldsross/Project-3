@@ -45,14 +45,20 @@ class simClass:
         self.ALU = alu.ALU(self.R, self.postALUBuff, self.preALUBuff, opcodeStr, arg1, arg2, arg3)
         self.MEM = mem.MEM(self.R, self.postMemBuff, self.preMemBuff, opcodeStr, arg1, arg2, arg3, dataval, address,
                            self.numInstructions)
-        self.cache = cache.Cache(numInstrs, instruction, dataval, address)
-        self.issue = issue.Issue(instruction, opcodes, opcodeStr, dataval, address, arg1, arg2, arg3, numInstrs,
-                                 destReg, src1Reg, src2Reg)
+        self.cache = cache.Cache(self.numInstructions, self.instruction, self.dataval, self.address)
+        self.issue = issue.Issue(instruction, opcodes, opcodeStr, dataval, address, arg1, arg2,
+                                arg3, numInstrs, destReg, src1Reg, src2Reg, self.preIssueBuff,
+                                self.preALUBuff, self.preMemBuff, self.postALUBuff, self.postMemBuff)
         self.fetch = fetch.Fetch(instruction, opcodeStr, dataval, address, arg1, arg2, arg3, self.numInstructions,
                                  destReg, src1Reg, src2Reg, self.preALUBuff, self.postALUBuff, self.PC, cache,
                                  self.preIssueBuff)
 
         self.outputFileName = SetUp.get_output_filename()
+
+    @classmethod
+    def isMemOp(cls, index):
+        if simClass.opcodeStr[index] == "LDUR" or simClass.opcodeStr[index] == "STUR":
+            return True
 
     def printState(self):
         outputFileName = SetUp.get_output_filename()

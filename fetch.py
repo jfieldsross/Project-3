@@ -1,3 +1,4 @@
+import cache
 
 class Fetch:
 
@@ -34,7 +35,7 @@ class Fetch:
         # cacheHit = boolean that equals true if there is a cache hit
 
         numIssued = 0
-        cacheHit = self.cache.checkCache(-1, instructionIndex, -1, -1)
+        cacheHit = cache.Cache.checkCache(-1, instructionIndex, 0, -1)
         notBranch = True
 
         while numIssued < 2 and emptyRoomInPreIssueBuffer and instructionIndex < self.numInstrs and cacheHit \

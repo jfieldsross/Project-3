@@ -24,7 +24,7 @@ class Cache:
     # 4 sets of two blocks with two words per block.  Each block has valid, dirty, tag
     cacheSets = [ [ [0,0,0,0,0], [0,0,0,0,0] ], [ [0,0,0,0,0], [0,0,0,0,0] ], [ [0,0,0,0,0], [0,0,0,0,0] ], [ [0,0,0,0,0], [0,0,0,0,0] ] ]
 
-    def __init__( self,numInstructions, instructions,dataval, address ):
+    def __init__(self,numInstructions, instructions,dataval, address ):
         self.numInstructions = numInstructions
         self.instructions = instructions
         self.dataval = dataval
@@ -57,8 +57,8 @@ class Cache:
                     # reset dirty bit
                     self.cacheSets[i][j][1] = 0
 
-
-    def checkCache( self, dataIndex, instructionIndex, isWriteToMem, dataToWrite ):
+    @classmethod
+    def checkCache(self, dataIndex, instructionIndex, isWriteToMem, dataToWrite ):
         # isWritetoMem is aligned with isSW in the mem unit! data to write also comes from there
         # check the cache, if it is there, then we return true
         # otherwise, return a false and set up for next cycle
@@ -71,7 +71,7 @@ class Cache:
 
             #if its a data location do this
         else:
-            addressLocal = 96 + (4 *  (self.numInstructions) ) + (4 * dataIndex)
+            addressLocal = 96 + (4 *  self.numInstructions ) + (4 * dataIndex)
 
         # We are double word aligning so we need to make sure that the address of block 0 is always 96 or 96 + n8
         # 96, 104, 112 ......
@@ -92,7 +92,7 @@ class Cache:
 
         ############################ Deal with instruct/mem boundry ################################
         # if address1 is an instruction go to instruction list and get it
-        if address1 < 96 + ( 4 * self.numInstructions ):   # cant use dataIndex because aligning might have bridged boundry!
+        if address1 < 96 + ( 4 * numInstructions ):   # cant use dataIndex because aligning might have bridged boundry!
             data1 = self.instructions[SetUp.getIndexOfMemAddress(address1, False, self.dataval, self.address, self.numInstructions)]
         #if data, go to the data memory and get the data
         else:
