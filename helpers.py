@@ -125,6 +125,11 @@ class SetUp:
         print(int(binary, 2))
 
     @classmethod
+    def isMemOp(cls, result):
+        if result == "LDUR" or result == "STUR":
+            return True
+
+    @classmethod
     def getIndexOfMemAddress(cls, currAddr, isSW, dataval, address, numInstructions):
 
         tempIndex = 0

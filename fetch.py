@@ -37,8 +37,9 @@ class Fetch:
         numIssued = 0
         cacheHit = self.cache.checkCache(-1, instructionIndex, 0, -1)
         notBranch = True
+        notBreak = True
 
-        while numIssued < 2 and emptyRoomInPreIssueBuffer and instructionIndex < self.numInstrs and cacheHit \
+        while numIssued < 2 and emptyRoomInPreIssueBuffer and instructionIndex < self.numInstructions and cacheHit \
                 and notBranch:
 
             notBranch = False
@@ -51,32 +52,32 @@ class Fetch:
             if cacheHit:
                 #TODO decode the instruction
 
-                if self.opcodeStr[instructionIndex] == "B": #Branch w/o checks
-                    self.PC = self.PC + ((4 * self.arg1[instructionIndex]) - 4)
+                if self.opcodeStr[int(instructionIndex)] == "B": #Branch w/o checks
+                    self.PC = self.PC + ((4 * self.arg1[int(instructionIndex)]) - 4)
 
-                elif self.opcodeStr[instructionIndex] == "CBZ": #Conditional Branch if Zero and checks for hazard
-                    if self.R[self.arg2[instructionIndex]] == 0:
+                elif self.opcodeStr[int(instructionIndex)] == "CBZ": #Conditional Branch if Zero and checks for hazard
+                    if self.R[self.arg2[int(instructionIndex)]] == 0:
                         for i in range(len(self.preIssueBuff)):
                             if self.preIssueBuff[i] != -1:
-                                if self.src1Reg[instructionIndex] == self.destReg[self.preIssueBuff[i]] or self.src2Reg[instructionIndex] == self.destReg[self.preIssueBuff[i]]:
+                                if self.src1Reg[int(instructionIndex)] == self.destReg[self.preIssueBuff[i]] or self.src2Reg[int(instructionIndex)] == self.destReg[self.preIssueBuff[i]]:
                                     hazard = True
                         if not hazard: #if there's no hazards jump PC
-                            self.PC = self.PC + ((4 * self.arg1[instructionIndex]) - 4)
+                            self.PC = self.PC + ((4 * self.arg1[int(instructionIndex)]) - 4)
 
-                elif self.opcodeStr[instructionIndex] == "CBNZ": #Conditional Branch if not zero and checks for hazard if hazard clear hazard
-                    if self.R[self.arg2[instructionIndex]] != 0:
+                elif self.opcodeStr[int(instructionIndex)] == "CBNZ": #Conditional Branch if not zero and checks for hazard if hazard clear hazard
+                    if self.R[self.arg2[int(instructionIndex)]] != 0:
                         for i in range(len(self.preIssueBuff)):
                             if self.preIssueBuff[i] != -1:
-                                if self.src1Reg[instructionIndex] == self.destReg[self.preIssueBuff[i]] or self.src2Reg[instructionIndex] == self.destReg[self.preIssueBuff[i]]:
+                                if self.src1Reg[int(instructionIndex)] == self.destReg[self.preIssueBuff[i]] or self.src2Reg[int(instructionIndex)] == self.destReg[self.preIssueBuff[i]]:
                                     hazard = True
                         if not hazard:
-                            self.PC = self.PC + ((4 * self.arg1[instructionIndex]) - 4)
+                            self.PC = self.PC + ((4 * self.arg1[int(instructionIndex)]) - 4)
 
-                elif self.opcodeStr[instructionIndex] == "NOP":
+                elif self.opcodeStr[int(instructionIndex)] == "NOP":
                     self.PC += 4
                     notBranch = True
 
-                elif self.opcodeStr[instructionIndex] == "BREAK":
+                elif self.opcodeStr[int(instructionIndex)] == "BREAK":
                     notBreak = False
                     notBranch = True
 
@@ -85,7 +86,7 @@ class Fetch:
                     i = 0
                     while self.preIssueBuff[i] != -1:
                         i += 1
-                    self.preIssueBuff[i] = instructionIndex
+                    self.preIssueBuff[i] = int(instructionIndex)
                     self.PC += 4
                     instructionIndex = (self.PC - 96) / 4
                     numIssued += 1

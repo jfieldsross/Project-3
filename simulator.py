@@ -55,11 +55,6 @@ class simClass:
 
         self.outputFileName = SetUp.get_output_filename()
 
-    @classmethod
-    def isMemOp(cls, index):
-        if simClass.opcodeStr[index] == "LDUR" or simClass.opcodeStr[index] == "STUR":
-            return True
-
     def printState(self):
         outputFileName = SetUp.get_output_filename()
 
@@ -69,8 +64,7 @@ class simClass:
     
             outFile.write("Pre-Issue Buffer:\n")
             if self.preIssueBuff[0] != -1:
-                outFile.write("\tEntry 0:\t" + str(self.opcodeStr[self.preIssueBuff[0]]) + str(self.arg1Str[self.preIssueBuff[0]])
-                      + str(self.arg2Str[self.preIssueBuff[0]]) + str(self.arg3Str[self.preIssueBuff[0]]) + '\n')
+                outFile.write("\tEntry 0:\t" + str(self.opcodeStr[self.preIssueBuff[0]]) + str(self.arg1Str[self.preIssueBuff[0]]) + str(self.arg2Str[self.preIssueBuff[0]]) + str(self.arg3Str[self.preIssueBuff[0]]) + '\n')
             else:
                 outFile.write("\tEntry 0:\t\n")
     
@@ -119,25 +113,25 @@ class simClass:
                 outFile.write("\tEntry 0:\t\n")
     
             outFile.write("Pre_MEM Queue:\n")
-            if self.preMEMBuff[0] != -1:
-                outFile.write("\tEntry 0:\t" + str(self.opcodeStr[self.preMEMBuff[0]]) +
-                              str(self.arg1Str[self.preMEMBuff[0]]) + str(self.arg2Str[self.preMEMBuff[0]]) +
-                              str(self.arg3Str[self.preMEMBuff[0]]) + '\n')
+            if self.preMemBuff[0] != -1:
+                outFile.write("\tEntry 0:\t" + str(self.opcodeStr[self.preMemBuff[0]]) +
+                              str(self.arg1Str[self.preMemBuff[0]]) + str(self.arg2Str[self.preMemBuff[0]]) +
+                              str(self.arg3Str[self.preMemBuff[0]]) + '\n')
             else:
                 outFile.write("\tEntry 0:\t\n")
     
-            if self.preMEMBuff[1] != -1:
-                outFile.write("\tEntry 1:\t" + str(self.opcodeStr[self.preMEMBuff[1]]) +
-                              str(self.arg1Str[self.preMEMBuff[1]]) + str(self.arg2Str[self.preMEMBuff[1]]) +
-                              str(self.arg3Str[self.preMEMBuff[1]]) + '\n')
+            if self.preMemBuff[1] != -1:
+                outFile.write("\tEntry 1:\t" + str(self.opcodeStr[self.preMemBuff[1]]) +
+                              str(self.arg1Str[self.preMemBuff[1]]) + str(self.arg2Str[self.preMemBuff[1]]) +
+                              str(self.arg3Str[self.preMemBuff[1]]) + '\n')
             else:
                 outFile.write("\tEntry 1:\t\n")
     
             outFile.write("Post_MEM Queue:\n")
-            if self.postMEMBuff[0] != -1:
-                outFile.write("\tEntry 0:\t" + str(self.opcodeStr[self.postMEMBuff[0]]) +
-                              str(self.arg1Str[self.postMEMBuff[0]]) + str(self.arg2Str[self.postMEMBuff[0]]) +
-                              str(self.arg3Str[self.postMEMBuff[0]]) + '\n')
+            if self.postMemBuff[0] != -1:
+                outFile.write("\tEntry 0:\t" + str(self.opcodeStr[self.postMemBuff[0]]) +
+                              str(self.arg1Str[self.postMemBuff[0]]) + str(self.arg2Str[self.postMemBuff[0]]) +
+                              str(self.arg3Str[self.postMemBuff[0]]) + '\n')
             else:
                 outFile.write("\tEntry 0:\t\n")
     

@@ -128,8 +128,8 @@ class Cache:
         #TODO make sure this binary op is working right !!!!!
 
 
-        setNum = (address1 & self.setMask) >> 3
-        tag = (address1 & self.tagMask) >> 5
+        setNum = (int(address1) & self.setMask) >> 3
+        tag = (int(address1) & self.tagMask) >> 5
 
 
 

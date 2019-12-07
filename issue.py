@@ -90,13 +90,13 @@ class Issue:
 
             if index != -1:
                 # if the instruction is a mem instruction and there is room in the pre mem buffer
-                if simulator.simClass.isMemOp(index) and thereIsRoomInPreMemBuff:
+                if SetUp.isMemOp(self.opcodeStr[index]) and thereIsRoomInPreMemBuff:
                     # RAWCheck method will check if there are any RAW hazards with the current instruction
                     # issueMe will equal True if there are no RAW hazards, false if there are
                     issueMe = self.RAWCheck(curr)
 
                 # if the instruction is an ALU instruction and there is room in the pre ALU buffer
-                if (not simulator.simClass.isMemOp(index)) and thereIsRoomInPreALUBuff:
+                if (not SetUp.isMemOp(self.opcodeStr[index])) and thereIsRoomInPreALUBuff:
                     # RAWCheck method will check if there are any RAW hazards with the current instruction
                     # issueMe will equal True if there are no RAW hazards, false if there are
                     issueMe = self.RAWCheck(curr)
@@ -108,7 +108,7 @@ class Issue:
 
                 # if the instruction is a mem instruction, check to see that all previous store
                 # instructions have been issued. If not, the instruction may not be issued this cycle
-                if simulator.simClass.isMemOp(index) and storeInstructionSkippedThisCycle:
+                if SetUp.isMemOp(self.opcodeStr[index]) and storeInstructionSkippedThisCycle:
                     issueMe = False
 
 
@@ -117,7 +117,7 @@ class Issue:
                 if issueMe:
                     numIssued += 1
                     # copy the instruction to the appropriate buffer
-                    if simulator.simClass.isMemOp(index):
+                    if SetUp.isMemOp(self.opcodeStr[index]):
                         self.preMemBuff[self.preMemBuff.index(-1)] = index
                     else:
                         self.preALUBuff[self.preALUBuff.index(-1)] = index
