@@ -123,3 +123,41 @@ class SetUp:
     def binaryToDecimal(cls, binary):
         print("\n")
         print(int(binary, 2))
+
+    @classmethod
+    def getIndexOfMemAddress(cls, currAddr, isSW, dataval, address, numInstructions):
+
+        tempIndex = 0
+        try:
+
+            if isSW:
+
+                if len(address) > numInstructions:
+
+                    lastInstructAddr = ((numInstructions - 1) * 4 ) + 96
+
+                    lastMemAddr = lastInstructAddr + 4 * len(dataval)
+                    if currAddr == lastMemAddr:
+                        dataval.append(0)
+                        dataval.append(0)
+                        address.append(lastMemAddr + 4)
+                        address.append(lastMemAddr + 8)
+
+                        if currAddr > lastMemAddr:
+                            addIndex = (currAddr - lastMemAddr) / 4
+                            for i in range(int(addIndex)):
+                                dataval.append(0)
+                                address.append(lastMemAddr + (4 * (i+4)))
+
+                tempIndex = address.index(currAddr)
+                tempIndex = tempIndex - numInstructions
+
+            else:
+                tempIndex = address.index(currAddr)
+
+                if tempIndex >= numInstructions:
+                    tempIndex = tempIndex - numInstructions
+
+            return  tempIndex
+        except ValueError:
+            print("ERROR -- did not find mem address currAddr" + str(currAddr))

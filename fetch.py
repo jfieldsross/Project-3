@@ -1,4 +1,4 @@
-import cache
+
 
 class Fetch:
 
@@ -13,14 +13,14 @@ class Fetch:
         self.arg1 = arg1
         self.arg2 = arg2
         self.arg3 = arg3
-        self.numInstrs = numInstructions
+        self.numInstructions = numInstructions
         self.destReg = destReg
         self.src1Reg = src1Reg
         self.src2Reg = src2Reg
         self.preALUBuff = preALUBuff
         self.postALUBuff = postALUBuff
         self.PC = PC
-        self.cache = cache
+        self.cache = cache.Cache(self.numInstructions, self.instruction, self.dataval, self.address)
         self.preIssueBuff = preIssueBuff
 
     def run(self):
@@ -35,7 +35,7 @@ class Fetch:
         # cacheHit = boolean that equals true if there is a cache hit
 
         numIssued = 0
-        cacheHit = cache.Cache.checkCache(-1, instructionIndex, 0, -1)
+        cacheHit = self.cache.checkCache(-1, instructionIndex, 0, -1)
         notBranch = True
 
         while numIssued < 2 and emptyRoomInPreIssueBuffer and instructionIndex < self.numInstrs and cacheHit \
@@ -43,6 +43,7 @@ class Fetch:
 
             notBranch = False
             notBreak = True
+
             hazard = False
             # before fetching following conditions must be true
             #notStalled = notBranch and cacheHit and emptyRoomInPreIssueBuffer
@@ -89,7 +90,7 @@ class Fetch:
                     instructionIndex = (self.PC - 96) / 4
                     numIssued += 1
 
-            cacheHit = self.cache.checkCache(-1, instructionIndex, -1, -1)
+            cacheHit = self.cache.checkCache(-1, instructionIndex, 0, -1)
 
 
         #before fetching following conditions must be true

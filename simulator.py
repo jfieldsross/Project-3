@@ -12,13 +12,13 @@ import masking_constants as MASKs
 class simClass:
 
     def __init__(self, instruction, opcodes, opcodeStr, dataval, address, arg1, arg2, arg3, arg1Str,
-                 arg2Str, arg3Str, numInstrs, destReg, src1Reg,
+                 arg2Str, arg3Str, numInstructions, destReg, src1Reg,
                  src2Reg):
         self.instruction = instruction
         self.opcode = opcodes
         self.dataval = dataval
         self.address = address
-        self.numInstructions = numInstrs
+        self.numInstructions = numInstructions
         self.arg1 = arg1
         self.arg2 = arg2
         self.arg3 = arg3
@@ -47,7 +47,7 @@ class simClass:
                            self.numInstructions)
         self.cache = cache.Cache(self.numInstructions, self.instruction, self.dataval, self.address)
         self.issue = issue.Issue(instruction, opcodes, opcodeStr, dataval, address, arg1, arg2,
-                                arg3, numInstrs, destReg, src1Reg, src2Reg, self.preIssueBuff,
+                                arg3, self.numInstructions, destReg, src1Reg, src2Reg, self.preIssueBuff,
                                 self.preALUBuff, self.preMemBuff, self.postALUBuff, self.postMemBuff)
         self.fetch = fetch.Fetch(instruction, opcodeStr, dataval, address, arg1, arg2, arg3, self.numInstructions,
                                  destReg, src1Reg, src2Reg, self.preALUBuff, self.postALUBuff, self.PC, cache,

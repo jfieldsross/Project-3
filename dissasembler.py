@@ -317,7 +317,7 @@ class dissasembler:
             "arg3Str":self.arg3Str,
             "dataval":self.dataval,
             "address":self.address,
-            "numInstrs":self.numInstructs,
+            "numInstructions":self.numInstructs,
             "destReg":self.destReg,
             "src1Reg":self.src1Reg,
             "src2Reg":self.src2Reg,
